@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import type { GoogleDriveFile } from '../../types';
 import { formatFileSize, formatDate } from '../../utils/formatters';
+import { useAuthContext } from '../../context/AuthContext';
 
 interface FileCardProps {
   file: GoogleDriveFile;
@@ -7,8 +9,46 @@ interface FileCardProps {
 }
 
 export const FileCard = ({ file, onClick }: FileCardProps) => {
+  const { accessToken } = useAuthContext();
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
   const isImage = file.mimeType?.startsWith('image/');
   const isPdf = file.mimeType === 'application/pdf';
+
+  // Fetch authenticated thumbnail using Google Drive API
+  useEffect(() => {
+    if (isImage && accessToken && !imageError && file.id) {
+      const fetchThumbnail = async () => {
+        try {
+          // Use Google Drive API to get file content with alt=media
+          const url = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
+          const response = await fetch(url, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+          if (response.ok) {
+            const blob = await response.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            setThumbnailUrl(objectUrl);
+          } else {
+            console.error('Failed to fetch image:', response.status);
+            setImageError(true);
+          }
+        } catch (error) {
+          console.error('Failed to fetch thumbnail:', error);
+          setImageError(true);
+        }
+      };
+      fetchThumbnail();
+    }
+
+    return () => {
+      if (thumbnailUrl) {
+        URL.revokeObjectURL(thumbnailUrl);
+      }
+    };
+  }, [isImage, file.id, accessToken, imageError]);
 
   const handleClick = () => {
     onClick(file);
@@ -21,12 +61,17 @@ export const FileCard = ({ file, onClick }: FileCardProps) => {
     >
       {/* Thumbnail */}
       <div className="aspect-square mb-3 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-        {isImage && file.thumbnailLink ? (
+        {isImage && thumbnailUrl && !imageError ? (
           <img
-            src={file.thumbnailLink}
+            src={thumbnailUrl}
             alt={file.name}
             className="w-full h-full object-cover"
+            onError={() => setImageError(true)}
           />
+        ) : isImage && !thumbnailUrl && !imageError ? (
+          <div className="w-full h-full flex items-center justify-center bg-blue-50">
+            <span className="text-5xl">🖼️</span>
+          </div>
         ) : isPdf ? (
           <div className="w-full h-full flex items-center justify-center bg-red-50">
             <span className="text-5xl">📄</span>

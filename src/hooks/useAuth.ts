@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { initGoogleAuth, signInWithGoogle, getUserProfile, signOut as authSignOut } from '../services/googleAuth';
-import { isAuthenticated as checkAuth, getAccessToken, getUserInfo } from '../services/tokenManager';
+import { useState, useEffect, useRef } from 'react';
+import { initGoogleAuth, signInWithGoogle, getUserProfile, signOut as authSignOut, refreshAccessToken } from '../services/googleAuth';
+import { isAuthenticated as checkAuth, getAccessToken, getUserInfo, isTokenExpired } from '../services/tokenManager';
 import type { AuthState } from '../types';
 
 export const useAuth = () => {
@@ -11,6 +11,7 @@ export const useAuth = () => {
     loading: true,
     error: null,
   });
+  const refreshTimerRef = useRef<NodeJS.Timeout>();
 
   // Initialize auth on mount
   useEffect(() => {
@@ -31,6 +32,9 @@ export const useAuth = () => {
             loading: false,
             error: null,
           });
+
+          // Start token refresh monitoring
+          startTokenRefreshMonitor();
         } else {
           setAuthState((prev) => ({ ...prev, loading: false }));
         }
@@ -44,7 +48,34 @@ export const useAuth = () => {
     };
 
     initialize();
+
+    return () => {
+      if (refreshTimerRef.current) {
+        clearInterval(refreshTimerRef.current);
+      }
+    };
   }, []);
+
+  // Monitor token expiry and refresh automatically
+  const startTokenRefreshMonitor = () => {
+    // Check every 5 minutes
+    refreshTimerRef.current = setInterval(async () => {
+      if (isTokenExpired()) {
+        console.log('Token expired, attempting silent refresh...');
+        try {
+          const { token } = await refreshAccessToken();
+          setAuthState((prev) => ({
+            ...prev,
+            accessToken: token,
+          }));
+          console.log('Token refreshed successfully');
+        } catch (error) {
+          console.error('Failed to refresh token, logging out...', error);
+          logout();
+        }
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+  };
 
   const login = async () => {
     try {
@@ -60,6 +91,9 @@ export const useAuth = () => {
         loading: false,
         error: null,
       });
+
+      // Start token refresh monitoring after login
+      startTokenRefreshMonitor();
     } catch (error) {
       setAuthState((prev) => ({
         ...prev,
@@ -71,6 +105,9 @@ export const useAuth = () => {
   };
 
   const logout = () => {
+    if (refreshTimerRef.current) {
+      clearInterval(refreshTimerRef.current);
+    }
     authSignOut();
     setAuthState({
       user: null,

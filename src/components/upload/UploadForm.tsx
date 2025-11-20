@@ -1,34 +1,37 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { useUpload } from '../../hooks/useUpload';
 import { useAuthContext } from '../../context/AuthContext';
 import { useDriveContext } from '../../context/DriveContext';
+import type { Folder } from '../../types';
 
 interface UploadFormProps {
   isOpen: boolean;
   onClose: () => void;
   folderId?: string;
   currentFolderId?: string;
+  currentFolder?: Folder | null;
+  folderPath?: Folder[];
 }
 
-export const UploadForm = ({ isOpen, onClose, folderId, currentFolderId }: UploadFormProps) => {
+export const UploadForm = ({ isOpen, onClose, folderId, currentFolderId, folderPath }: UploadFormProps) => {
   const { accessToken } = useAuthContext();
-  const { folders, fetchFolders } = useDriveContext();
+  const { fetchFolders } = useDriveContext();
   const { upload, uploadProgress } = useUpload(accessToken);
 
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
-  const [selectedFolder, setSelectedFolder] = useState(folderId || '');
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Set the selected folder when modal opens or folderId changes
-  useEffect(() => {
-    if (isOpen) {
-      setSelectedFolder(folderId || '');
+  // Build the folder path string
+  const getFolderPathString = () => {
+    if (!folderPath || folderPath.length === 0) {
+      return 'Home';
     }
-  }, [isOpen, folderId]);
+    return 'Home / ' + folderPath.map(f => f.name).join(' / ');
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -46,11 +49,11 @@ export const UploadForm = ({ isOpen, onClose, folderId, currentFolderId }: Uploa
   };
 
   const handleUpload = async () => {
-    if (!file || !selectedFolder) return;
+    if (!file || !folderId) return;
 
     const success = await upload({
       file,
-      folderId: selectedFolder,
+      folderId: folderId,
       fileName,
     });
 
@@ -59,7 +62,6 @@ export const UploadForm = ({ isOpen, onClose, folderId, currentFolderId }: Uploa
       await fetchFolders(currentFolderId);
       setFile(null);
       setFileName('');
-      setSelectedFolder('');
       setPreview(null);
       onClose();
     }
@@ -105,20 +107,11 @@ export const UploadForm = ({ isOpen, onClose, folderId, currentFolderId }: Uploa
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Select Folder
+                Uploading to:
               </label>
-              <select
-                value={selectedFolder}
-                onChange={(e) => setSelectedFolder(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select a folder</option>
-                {folders.map((folder) => (
-                  <option key={folder.id} value={folder.id}>
-                    {folder.name}
-                  </option>
-                ))}
-              </select>
+              <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-700">
+                📁 {getFolderPathString()}
+              </div>
             </div>
 
             {uploadProgress.status === 'uploading' && (
@@ -138,7 +131,7 @@ export const UploadForm = ({ isOpen, onClose, folderId, currentFolderId }: Uploa
             <Button
               onClick={handleUpload}
               className="w-full"
-              disabled={!fileName || !selectedFolder}
+              disabled={!fileName || !folderId}
               loading={uploadProgress.status === 'uploading'}
             >
               Upload to Drive

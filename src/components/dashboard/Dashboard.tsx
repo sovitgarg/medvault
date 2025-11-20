@@ -186,6 +186,7 @@ export const Dashboard = () => {
           onClose={() => setShowUpload(false)}
           folderId={currentFolder?.id}
           currentFolderId={currentFolder?.id}
+          folderPath={folderPath}
         />
       )}
 
@@ -195,6 +196,7 @@ export const Dashboard = () => {
           onClose={() => setShowCamera(false)}
           folderId={currentFolder?.id}
           currentFolderId={currentFolder?.id}
+          folderPath={folderPath}
         />
       )}
     </div>

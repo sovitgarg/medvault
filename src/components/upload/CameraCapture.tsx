@@ -6,44 +6,53 @@ import { useUpload } from '../../hooks/useUpload';
 import { useAuthContext } from '../../context/AuthContext';
 import { useDriveContext } from '../../context/DriveContext';
 import { generateFileName } from '../../utils/fileHelpers';
+import type { Folder } from '../../types';
 
 interface CameraCaptureProps {
   isOpen: boolean;
   onClose: () => void;
   folderId?: string;
   currentFolderId?: string;
+  currentFolder?: Folder | null;
+  folderPath?: Folder[];
 }
 
-export const CameraCapture = ({ isOpen, onClose, folderId, currentFolderId }: CameraCaptureProps) => {
+export const CameraCapture = ({ isOpen, onClose, folderId, currentFolderId, folderPath }: CameraCaptureProps) => {
   const { accessToken } = useAuthContext();
-  const { folders, fetchFolders } = useDriveContext();
+  const { fetchFolders } = useDriveContext();
   const { videoRef, capturedImage, isActive, startCamera, stopCamera, capturePhoto, clearCapturedImage } = useCamera();
   const { upload, uploadProgress } = useUpload(accessToken);
 
   const [fileName, setFileName] = useState('');
-  const [selectedFolder, setSelectedFolder] = useState(folderId || '');
 
   useEffect(() => {
     if (isOpen) {
       startCamera();
       setFileName(generateFileName('photo'));
-      setSelectedFolder(folderId || '');
     } else {
       stopCamera();
       clearCapturedImage();
     }
   }, [isOpen, folderId]);
 
+  // Build the folder path string
+  const getFolderPathString = () => {
+    if (!folderPath || folderPath.length === 0) {
+      return 'Home';
+    }
+    return 'Home / ' + folderPath.map(f => f.name).join(' / ');
+  };
+
   const handleCapture = async () => {
     await capturePhoto();
   };
 
   const handleUpload = async () => {
-    if (!capturedImage || !selectedFolder) return;
+    if (!capturedImage || !folderId) return;
 
     const success = await upload({
       file: capturedImage.file,
-      folderId: selectedFolder,
+      folderId: folderId,
       fileName,
     });
 
@@ -91,20 +100,11 @@ export const CameraCapture = ({ isOpen, onClose, folderId, currentFolderId }: Ca
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Select Folder
+                Uploading to:
               </label>
-              <select
-                value={selectedFolder}
-                onChange={(e) => setSelectedFolder(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select a folder</option>
-                {folders.map((folder) => (
-                  <option key={folder.id} value={folder.id}>
-                    {folder.name}
-                  </option>
-                ))}
-              </select>
+              <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-700">
+                📁 {getFolderPathString()}
+              </div>
             </div>
 
             <div className="flex space-x-2">
@@ -118,7 +118,7 @@ export const CameraCapture = ({ isOpen, onClose, folderId, currentFolderId }: Ca
               <Button
                 onClick={handleUpload}
                 className="flex-1"
-                disabled={!fileName || !selectedFolder}
+                disabled={!fileName || !folderId}
                 loading={uploadProgress.status === 'uploading'}
               >
                 Upload

@@ -43,9 +43,9 @@ export const initGoogleAuth = (): Promise<void> => {
 /**
  * Sign in with Google
  */
-export const signInWithGoogle = (): Promise<{ token: string; expiresIn: number }> => {
+export const signInWithGoogle = (silent: boolean = false): Promise<{ token: string; expiresIn: number }> => {
   return new Promise((resolve, reject) => {
-    console.log('signInWithGoogle called');
+    console.log('signInWithGoogle called, silent:', silent);
     console.log('GOOGLE_CLIENT_ID:', GOOGLE_CLIENT_ID);
     console.log('GOOGLE_SCOPES:', GOOGLE_SCOPES);
 
@@ -76,8 +76,21 @@ export const signInWithGoogle = (): Promise<{ token: string; expiresIn: number }
     });
 
     console.log('Requesting access token...');
-    client.requestAccessToken();
+    // @ts-ignore - prompt option exists but not in type definition
+    client.requestAccessToken({ prompt: silent ? '' : 'consent' });
   });
+};
+
+/**
+ * Silently refresh access token
+ */
+export const refreshAccessToken = async (): Promise<{ token: string; expiresIn: number }> => {
+  try {
+    return await signInWithGoogle(true);
+  } catch (error) {
+    console.error('Silent token refresh failed:', error);
+    throw error;
+  }
 };
 
 /**
