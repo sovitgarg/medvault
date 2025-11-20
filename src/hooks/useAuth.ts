@@ -11,7 +11,7 @@ export const useAuth = () => {
     loading: true,
     error: null,
   });
-  const refreshTimerRef = useRef<NodeJS.Timeout>();
+  const refreshTimerRef = useRef<number | undefined>(undefined);
 
   // Initialize auth on mount
   useEffect(() => {
@@ -50,8 +50,8 @@ export const useAuth = () => {
     initialize();
 
     return () => {
-      if (refreshTimerRef.current) {
-        clearInterval(refreshTimerRef.current);
+      if (refreshTimerRef.current !== undefined) {
+        window.clearInterval(refreshTimerRef.current);
       }
     };
   }, []);
@@ -59,7 +59,7 @@ export const useAuth = () => {
   // Monitor token expiry and refresh automatically
   const startTokenRefreshMonitor = () => {
     // Check every 5 minutes
-    refreshTimerRef.current = setInterval(async () => {
+    refreshTimerRef.current = window.setInterval(async () => {
       if (isTokenExpired()) {
         console.log('Token expired, attempting silent refresh...');
         try {
@@ -105,8 +105,8 @@ export const useAuth = () => {
   };
 
   const logout = () => {
-    if (refreshTimerRef.current) {
-      clearInterval(refreshTimerRef.current);
+    if (refreshTimerRef.current !== undefined) {
+      window.clearInterval(refreshTimerRef.current);
     }
     authSignOut();
     setAuthState({
