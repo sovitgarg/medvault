@@ -6,8 +6,8 @@ export const Header = () => {
   return (
     <header className="bg-white shadow-sm border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex justify-between items-center">
-          <div className="flex flex-col">
+        <div className="flex justify-between items-start">
+          <div className="flex flex-col space-y-2">
             <div className="flex items-center space-x-3">
               <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2.5 rounded-xl shadow-lg">
                 <span className="text-2xl">🏥</span>
@@ -17,32 +17,34 @@ export const Header = () => {
               </h1>
             </div>
             {isAuthenticated && (
-              <div className="flex items-center space-x-2 mt-2 ml-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-xs font-medium text-green-700">Connected</span>
-              </div>
+              <>
+                <div className="flex items-center space-x-2 ml-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-medium text-green-700">Connected</span>
+                </div>
+                {user && (
+                  <div className="flex items-center space-x-2 ml-1">
+                    {user.picture && (
+                      <img
+                        src={user.picture}
+                        alt={user.name}
+                        className="w-7 h-7 rounded-full border-2 border-blue-200"
+                      />
+                    )}
+                    <span className="text-sm font-medium text-gray-700 whitespace-nowrap">{user.name}</span>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
-          {isAuthenticated && user && (
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-3">
-                {user.picture && (
-                  <img
-                    src={user.picture}
-                    alt={user.name}
-                    className="w-9 h-9 rounded-full border-2 border-blue-200"
-                  />
-                )}
-                <span className="text-sm font-medium text-gray-700">{user.name}</span>
-              </div>
-              <button
-                onClick={logout}
-                className="text-sm font-medium text-gray-600 hover:text-red-600 transition-colors px-4 py-2 rounded-lg hover:bg-red-50"
-              >
-                Logout
-              </button>
-            </div>
+          {isAuthenticated && (
+            <button
+              onClick={logout}
+              className="text-sm font-medium text-gray-600 hover:text-red-600 transition-colors px-4 py-2 rounded-lg hover:bg-red-50"
+            >
+              Logout
+            </button>
           )}
         </div>
       </div>
