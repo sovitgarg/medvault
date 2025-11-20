@@ -136,6 +136,10 @@ export const Dashboard = () => {
           isOpen={showCreateFolder}
           onClose={() => setShowCreateFolder(false)}
           parentFolderId={currentFolder?.id}
+          onFolderCreated={(newFolder) => {
+            setFolderPath([...folderPath, newFolder]);
+            setCurrentFolder(newFolder);
+          }}
         />
       )}
 

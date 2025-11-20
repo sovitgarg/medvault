@@ -8,9 +8,10 @@ interface CreateFolderModalProps {
   isOpen: boolean;
   onClose: () => void;
   parentFolderId?: string;
+  onFolderCreated?: (folder: any) => void;
 }
 
-export const CreateFolderModal = ({ isOpen, onClose, parentFolderId }: CreateFolderModalProps) => {
+export const CreateFolderModal = ({ isOpen, onClose, parentFolderId, onFolderCreated }: CreateFolderModalProps) => {
   const { createFolder } = useDriveContext();
   const [folderName, setFolderName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -26,9 +27,12 @@ export const CreateFolderModal = ({ isOpen, onClose, parentFolderId }: CreateFol
     try {
       setIsCreating(true);
       setError(null);
-      await createFolder(folderName, parentFolderId);
+      const newFolder = await createFolder(folderName, parentFolderId);
       setFolderName('');
       onClose();
+      if (newFolder && onFolderCreated) {
+        onFolderCreated(newFolder);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create folder');
     } finally {
