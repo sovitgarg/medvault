@@ -1,27 +1,19 @@
-import { useState } from 'react';
-import { useDriveContext } from '../../context/DriveContext';
+interface SearchBarProps {
+  value: string;
+  onChange: (value: string) => void;
+}
 
-export const SearchBar = () => {
-  const [query, setQuery] = useState('');
-  const { searchFolders, fetchFolders } = useDriveContext();
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
-
-    if (value.trim()) {
-      searchFolders(value);
-    } else {
-      fetchFolders();
-    }
+export const SearchBar = ({ value, onChange }: SearchBarProps) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e.target.value);
   };
 
   return (
     <div className="relative max-w-2xl">
       <input
         type="text"
-        value={query}
-        onChange={handleSearch}
+        value={value}
+        onChange={handleChange}
         placeholder="Search folders and files..."
         className="w-full px-6 py-4 pl-14 pr-4 text-base border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white"
       />

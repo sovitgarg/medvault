@@ -2,10 +2,11 @@ import { createContext, useContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useDrive } from '../hooks/useDrive';
 import { useAuthContext } from './AuthContext';
-import type { Folder } from '../types';
+import type { Folder, GoogleDriveFile } from '../types';
 
 interface DriveContextType {
   folders: Folder[];
+  files: GoogleDriveFile[];
   loading: boolean;
   error: string | null;
   fetchFolders: (parentFolderId?: string) => Promise<void>;

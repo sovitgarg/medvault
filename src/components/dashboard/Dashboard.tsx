@@ -1,25 +1,42 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Header } from '../common/Header';
 import { FolderGrid } from './FolderGrid';
+import { FileGrid } from './FileGrid';
 import { SearchBar } from './SearchBar';
 import { useDriveContext } from '../../context/DriveContext';
 import { Loading } from '../common/Loading';
 import { CreateFolderModal } from '../folder/CreateFolderModal';
 import { UploadForm } from '../upload/UploadForm';
 import { CameraCapture } from '../upload/CameraCapture';
-import type { Folder } from '../../types';
+import type { Folder, GoogleDriveFile } from '../../types';
 
 export const Dashboard = () => {
-  const { folders, loading, fetchFolders } = useDriveContext();
+  const { folders, files, loading, fetchFolders } = useDriveContext();
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [currentFolder, setCurrentFolder] = useState<Folder | null>(null);
   const [folderPath, setFolderPath] = useState<Folder[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchFolders(currentFolder?.id);
   }, [currentFolder]);
+
+  // Filter folders and files based on search query
+  const filteredFolders = useMemo(() => {
+    if (!searchQuery.trim()) return folders;
+    return folders.filter(folder =>
+      folder.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [folders, searchQuery]);
+
+  const filteredFiles = useMemo(() => {
+    if (!searchQuery.trim()) return files;
+    return files.filter(file =>
+      file.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [files, searchQuery]);
 
   if (loading && folders.length === 0) {
     return <Loading />;
@@ -112,11 +129,43 @@ export const Dashboard = () => {
 
         {/* Search Bar */}
         <div className="mb-8">
-          <SearchBar />
+          <SearchBar value={searchQuery} onChange={setSearchQuery} />
         </div>
 
         {/* Folder Grid */}
-        <FolderGrid folders={folders} loading={loading} onFolderClick={handleFolderClick} />
+        {filteredFolders.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Folders</h3>
+            <FolderGrid folders={filteredFolders} loading={loading} onFolderClick={handleFolderClick} />
+          </div>
+        )}
+
+        {/* File Grid - Only show when inside a folder */}
+        {currentFolder && filteredFiles.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Files</h3>
+            <FileGrid
+              files={filteredFiles}
+              loading={loading}
+              onFileClick={(file) => {
+                if (file.webViewLink) {
+                  window.open(file.webViewLink, '_blank');
+                }
+              }}
+            />
+          </div>
+        )}
+
+        {/* Empty state when no results */}
+        {!loading && filteredFolders.length === 0 && filteredFiles.length === 0 && searchQuery && (
+          <div className="text-center py-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+              <span className="text-3xl">🔍</span>
+            </div>
+            <p className="text-gray-500 text-lg">No results found for "{searchQuery}"</p>
+            <p className="text-gray-400 text-sm mt-1">Try a different search term</p>
+          </div>
+        )}
       </main>
 
       {showCreateFolder && (

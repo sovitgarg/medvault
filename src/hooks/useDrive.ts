@@ -1,13 +1,15 @@
 import { useState, useCallback } from 'react';
 import {
   listFolders,
+  listFiles,
   searchFolders as searchDriveFolders,
   createFolder as createDriveFolder,
 } from '../services/googleDrive';
-import type { Folder } from '../types';
+import type { Folder, GoogleDriveFile } from '../types';
 
 export const useDrive = (accessToken: string | null) => {
   const [folders, setFolders] = useState<Folder[]>([]);
+  const [files, setFiles] = useState<GoogleDriveFile[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,6 +21,14 @@ export const useDrive = (accessToken: string | null) => {
       setError(null);
       const fetchedFolders = await listFolders(accessToken, parentFolderId);
       setFolders(fetchedFolders);
+
+      // Fetch files if inside a folder
+      if (parentFolderId) {
+        const fetchedFiles = await listFiles(accessToken, parentFolderId);
+        setFiles(fetchedFiles);
+      } else {
+        setFiles([]);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch folders');
     } finally {
@@ -66,6 +76,7 @@ export const useDrive = (accessToken: string | null) => {
 
   return {
     folders,
+    files,
     loading,
     error,
     fetchFolders,
