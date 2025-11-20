@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - MedVault</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+    }
+    h1 { color: #2563eb; }
+    h2 { color: #1e40af; margin-top: 30px; }
+    .highlight { background-color: #dbeafe; padding: 15px; border-left: 4px solid #2563eb; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>🏥 MedVault Privacy Policy</h1>
+  <p><em>Last Updated: November 19, 2025</em></p>
+
+  <div class="highlight">
+    <strong>Privacy Statement:</strong> MedVault runs entirely in your browser. We never see, store, or access your medical documents.
+  </div>
+
+  <h2>What is MedVault?</h2>
+  <p>MedVault is a privacy-first web application that helps medical professionals organize documents in their Google Drive using camera capture and file uploads.</p>
+
+  <h2>Zero-Access Architecture</h2>
+  <p>MedVault is built with a zero-backend, client-side-only architecture:</p>
+  <ul>
+    <li>No backend server - the app runs entirely in your browser</li>
+    <li>No database - we don't store any user data</li>
+    <li>No file storage - all files go directly to your Google Drive</li>
+    <li>No analytics - we don't track your usage</li>
+  </ul>
+
+  <h2>Google Drive Access</h2>
+  <p>We request minimal Google Drive permissions:</p>
+  <ul>
+    <li><strong>drive.file</strong> - Create and manage files you create with MedVault</li>
+    <li><strong>drive.metadata.readonly</strong> - View folder names and metadata</li>
+    <li><strong>drive.folders</strong> - Create and organize folders</li>
+  </ul>
+  <p><strong>Important:</strong> We do NOT use broad Drive access. We cannot read your existing files or access files not created through MedVault.</p>
+
+  <h2>Data Flow</h2>
+  <p>When you use MedVault:</p>
+  <ol>
+    <li>You authenticate with Google OAuth (handled by Google)</li>
+    <li>Your browser receives an access token (stored in session storage)</li>
+    <li>When you upload a file, it goes directly from your browser to Google Drive</li>
+    <li>MedVault never touches, sees, or stores your file content</li>
+  </ol>
+
+  <h2>Session Storage</h2>
+  <p>We use browser session storage (not cookies) to store:</p>
+  <ul>
+    <li>Google OAuth access token (deleted when you close the browser)</li>
+    <li>Your basic profile info (name, email, profile picture)</li>
+  </ul>
+  <p>This data is only stored in your browser and is never sent to any server.</p>
+
+  <h2>HIPAA Compliance</h2>
+  <p>MedVault is designed with HIPAA-compliant architecture in mind:</p>
+  <ul>
+    <li>No PHI (Protected Health Information) is ever transmitted to or stored by MedVault</li>
+    <li>All data stays in your Google Drive account</li>
+    <li>No business associate agreement is needed because we never access PHI</li>
+  </ul>
+  <p><strong>Note:</strong> Users are responsible for ensuring their Google Drive account meets their organization's HIPAA requirements.</p>
+
+  <h2>Third-Party Services</h2>
+  <p>MedVault relies on:</p>
+  <ul>
+    <li><strong>Google OAuth & Drive API</strong> - For authentication and file storage</li>
+    <li><strong>Cloudflare Pages</strong> - For hosting static files (no logging)</li>
+  </ul>
+
+  <h2>Your Rights</h2>
+  <p>You have full control:</p>
+  <ul>
+    <li>Revoke MedVault's access anytime via <a href="https://myaccount.google.com/permissions">Google Account Permissions</a></li>
+    <li>All files remain in your Google Drive after revocation</li>
+    <li>Delete session data by logging out or closing your browser</li>
+  </ul>
+
+  <h2>Changes to Privacy Policy</h2>
+  <p>We may update this policy. Changes will be posted on this page with an updated date.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about privacy? The source code is open for audit at [GitHub Repository Link]</p>
+
+  <p style="margin-top: 40px; text-align: center;">
+    <a href="/" style="color: #2563eb; text-decoration: none;">← Back to MedVault</a>
+  </p>
+</body>
+</html>
