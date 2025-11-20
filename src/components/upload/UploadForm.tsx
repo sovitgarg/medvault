@@ -9,23 +9,24 @@ interface UploadFormProps {
   isOpen: boolean;
   onClose: () => void;
   folderId?: string;
+  currentFolderId?: string;
 }
 
-export const UploadForm = ({ isOpen, onClose, folderId }: UploadFormProps) => {
+export const UploadForm = ({ isOpen, onClose, folderId, currentFolderId }: UploadFormProps) => {
   const { accessToken } = useAuthContext();
   const { folders, fetchFolders } = useDriveContext();
   const { upload, uploadProgress } = useUpload(accessToken);
 
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
-  const [selectedFolder, setSelectedFolder] = useState('');
+  const [selectedFolder, setSelectedFolder] = useState(folderId || '');
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Set the selected folder when modal opens
+  // Set the selected folder when modal opens or folderId changes
   useEffect(() => {
-    if (isOpen && folderId) {
-      setSelectedFolder(folderId);
+    if (isOpen) {
+      setSelectedFolder(folderId || '');
     }
   }, [isOpen, folderId]);
 
@@ -54,7 +55,8 @@ export const UploadForm = ({ isOpen, onClose, folderId }: UploadFormProps) => {
     });
 
     if (success) {
-      await fetchFolders();
+      // Refresh the current folder we're viewing in the Dashboard
+      await fetchFolders(currentFolderId);
       setFile(null);
       setFileName('');
       setSelectedFolder('');

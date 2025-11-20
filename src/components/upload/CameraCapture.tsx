@@ -11,24 +11,23 @@ interface CameraCaptureProps {
   isOpen: boolean;
   onClose: () => void;
   folderId?: string;
+  currentFolderId?: string;
 }
 
-export const CameraCapture = ({ isOpen, onClose, folderId }: CameraCaptureProps) => {
+export const CameraCapture = ({ isOpen, onClose, folderId, currentFolderId }: CameraCaptureProps) => {
   const { accessToken } = useAuthContext();
   const { folders, fetchFolders } = useDriveContext();
   const { videoRef, capturedImage, isActive, startCamera, stopCamera, capturePhoto, clearCapturedImage } = useCamera();
   const { upload, uploadProgress } = useUpload(accessToken);
 
   const [fileName, setFileName] = useState('');
-  const [selectedFolder, setSelectedFolder] = useState('');
+  const [selectedFolder, setSelectedFolder] = useState(folderId || '');
 
   useEffect(() => {
     if (isOpen) {
       startCamera();
       setFileName(generateFileName('photo'));
-      if (folderId) {
-        setSelectedFolder(folderId);
-      }
+      setSelectedFolder(folderId || '');
     } else {
       stopCamera();
       clearCapturedImage();
@@ -49,7 +48,8 @@ export const CameraCapture = ({ isOpen, onClose, folderId }: CameraCaptureProps)
     });
 
     if (success) {
-      await fetchFolders();
+      // Refresh the current folder we're viewing in the Dashboard
+      await fetchFolders(currentFolderId);
       onClose();
     }
   };

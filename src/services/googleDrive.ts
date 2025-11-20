@@ -163,14 +163,11 @@ export const uploadFile = async (
     formData.append('file', file);
 
     const response = await axios.post<GoogleDriveFile>(
-      `${DRIVE_UPLOAD_API}/files?uploadType=multipart`,
+      `${DRIVE_UPLOAD_API}/files?uploadType=multipart&fields=id,name,mimeType,createdTime,modifiedTime,size,webViewLink`,
       formData,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-        },
-        params: {
-          fields: 'id, name, mimeType, createdTime, modifiedTime, size, webViewLink',
         },
         onUploadProgress: (progressEvent) => {
           if (onProgress && progressEvent.total) {
