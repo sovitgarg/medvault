@@ -73,7 +73,8 @@ export const Dashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Top Actions Bar with Navigation */}
         <div className="mb-8 flex flex-col gap-4">
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Back Button and Action Buttons Row */}
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             {folderPath.length > 0 && (
               <button
                 onClick={handleBack}
@@ -85,46 +86,51 @@ export const Dashboard = () => {
                 <span>Back</span>
               </button>
             )}
-            <div className="flex items-center space-x-2 text-base">
-              <button onClick={() => handleBreadcrumbClick(-1)} className="font-semibold text-gray-700 hover:text-blue-600 transition-colors">
-                Home
+            {!folderPath.length && <div></div>}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowCreateFolder(true)}
+                className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
+              >
+                <span className="text-lg">📁</span>
+                <span>New Folder</span>
               </button>
-              {folderPath.map((folder, index) => (
-                <div key={folder.id} className="flex items-center space-x-2">
-                  <span className="text-gray-400">/</span>
-                  <button
-                    onClick={() => handleBreadcrumbClick(index)}
-                    className="font-semibold text-gray-700 hover:text-blue-600 transition-colors"
-                  >
-                    {folder.name}
-                  </button>
-                </div>
-              ))}
+              <button
+                onClick={() => setShowUpload(true)}
+                className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
+              >
+                <span className="text-lg">📤</span>
+                <span>Upload</span>
+              </button>
             </div>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={() => setShowCreateFolder(true)}
-              className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
-            >
-              <span className="text-lg">📁</span>
-              <span>New Folder</span>
+
+          {/* Folder Path */}
+          <div className="flex items-center space-x-2 text-base">
+            <button onClick={() => handleBreadcrumbClick(-1)} className="font-semibold text-gray-700 hover:text-blue-600 transition-colors">
+              Home
             </button>
-            <button
-              onClick={() => setShowUpload(true)}
-              className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
-            >
-              <span className="text-lg">📤</span>
-              <span>Upload</span>
-            </button>
-            <button
-              onClick={() => setShowCamera(true)}
-              className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
-            >
-              <span className="text-lg">📸</span>
-              <span>Camera</span>
-            </button>
+            {folderPath.map((folder, index) => (
+              <div key={folder.id} className="flex items-center space-x-2">
+                <span className="text-gray-400">/</span>
+                <button
+                  onClick={() => handleBreadcrumbClick(index)}
+                  className="font-semibold text-gray-700 hover:text-blue-600 transition-colors"
+                >
+                  {folder.name}
+                </button>
+              </div>
+            ))}
           </div>
+
+          {/* Camera Button - Full Width */}
+          <button
+            onClick={() => setShowCamera(true)}
+            className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-lg"
+          >
+            <span className="text-2xl">📸</span>
+            <span>Take Photo</span>
+          </button>
         </div>
 
         {/* Search Bar */}
