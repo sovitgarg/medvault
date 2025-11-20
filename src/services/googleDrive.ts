@@ -107,6 +107,36 @@ export const createFolder = async (
 };
 
 /**
+ * List files in a specific folder
+ */
+export const listFiles = async (
+  accessToken: string,
+  folderId: string,
+  pageSize: number = 100
+): Promise<GoogleDriveFile[]> => {
+  try {
+    const query = `'${folderId}' in parents and mimeType!='${MIME_TYPES.FOLDER}' and trashed=false`;
+
+    const response = await axios.get<ListFilesResponse>(`${DRIVE_API_BASE}/files`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      params: {
+        q: query,
+        fields: 'files(id, name, mimeType, createdTime, modifiedTime, size, webViewLink, thumbnailLink)',
+        pageSize,
+        orderBy: 'modifiedTime desc',
+      },
+    });
+
+    return response.data.files as GoogleDriveFile[];
+  } catch (error) {
+    console.error('Error listing files:', error);
+    throw new Error('Failed to list files');
+  }
+};
+
+/**
  * Upload a file to Google Drive
  */
 export const uploadFile = async (
