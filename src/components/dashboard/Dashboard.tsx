@@ -109,6 +109,11 @@ export const Dashboard = () => {
             <button onClick={() => handleBreadcrumbClick(-1)} className="font-semibold text-gray-700 hover:text-blue-600 transition-colors">
               Home
             </button>
+            {folderPath.length === 0 && (
+              <span className="text-sm font-medium bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                - Select a folder to get started
+              </span>
+            )}
             {folderPath.map((folder, index) => (
               <div key={folder.id} className="flex items-center space-x-2">
                 <span className="text-gray-400">/</span>
