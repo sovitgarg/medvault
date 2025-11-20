@@ -10,7 +10,7 @@ interface DriveContextType {
   error: string | null;
   fetchFolders: (parentFolderId?: string) => Promise<void>;
   searchFolders: (query: string) => Promise<void>;
-  createFolder: (folderName: string) => Promise<Folder | null>;
+  createFolder: (folderName: string, parentFolderId?: string) => Promise<Folder | null>;
 }
 
 const DriveContext = createContext<DriveContextType | undefined>(undefined);

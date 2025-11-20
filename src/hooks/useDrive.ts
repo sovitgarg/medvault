@@ -45,13 +45,13 @@ export const useDrive = (accessToken: string | null) => {
   );
 
   const createFolder = useCallback(
-    async (folderName: string): Promise<Folder | null> => {
+    async (folderName: string, parentFolderId?: string): Promise<Folder | null> => {
       if (!accessToken) return null;
 
       try {
         setLoading(true);
         setError(null);
-        const newFolder = await createDriveFolder(accessToken, folderName);
+        const newFolder = await createDriveFolder(accessToken, folderName, parentFolderId);
         setFolders((prev) => [newFolder, ...prev]);
         return newFolder;
       } catch (err) {
