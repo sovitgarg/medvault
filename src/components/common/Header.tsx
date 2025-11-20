@@ -16,25 +16,17 @@ export const Header = () => {
                 MedVault
               </h1>
             </div>
-            {isAuthenticated && (
-              <>
-                <div className="flex items-center space-x-2 ml-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs font-medium text-green-700">Connected</span>
-                </div>
-                {user && (
-                  <div className="flex items-center space-x-2 ml-1">
-                    {user.picture && (
-                      <img
-                        src={user.picture}
-                        alt={user.name}
-                        className="w-7 h-7 rounded-full border-2 border-blue-200"
-                      />
-                    )}
-                    <span className="text-sm font-medium text-gray-700 whitespace-nowrap">{user.name}</span>
-                  </div>
+            {isAuthenticated && user && (
+              <div className="flex items-center space-x-2 ml-1">
+                {user.picture && (
+                  <img
+                    src={user.picture}
+                    alt={user.name}
+                    className="w-7 h-7 rounded-full border-2 border-blue-200"
+                  />
                 )}
-              </>
+                <span className="text-sm font-medium text-gray-700 whitespace-nowrap">{user.name}</span>
+              </div>
             )}
           </div>
 

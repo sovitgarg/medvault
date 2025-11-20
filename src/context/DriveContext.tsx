@@ -17,8 +17,8 @@ interface DriveContextType {
 const DriveContext = createContext<DriveContextType | undefined>(undefined);
 
 export const DriveProvider = ({ children }: { children: ReactNode }) => {
-  const { accessToken, isAuthenticated } = useAuthContext();
-  const drive = useDrive(accessToken);
+  const { accessToken, isAuthenticated, logout } = useAuthContext();
+  const drive = useDrive(accessToken, logout);
 
   // Auto-fetch folders when authenticated
   useEffect(() => {

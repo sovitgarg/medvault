@@ -18,10 +18,10 @@ interface CameraCaptureProps {
 }
 
 export const CameraCapture = ({ isOpen, onClose, folderId, currentFolderId, folderPath }: CameraCaptureProps) => {
-  const { accessToken } = useAuthContext();
+  const { accessToken, logout } = useAuthContext();
   const { fetchFolders } = useDriveContext();
   const { videoRef, capturedImage, isActive, startCamera, stopCamera, capturePhoto, clearCapturedImage } = useCamera();
-  const { upload, uploadProgress } = useUpload(accessToken);
+  const { upload, uploadProgress } = useUpload(accessToken, logout);
 
   const [fileName, setFileName] = useState('');
 

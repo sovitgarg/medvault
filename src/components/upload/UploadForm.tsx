@@ -16,9 +16,9 @@ interface UploadFormProps {
 }
 
 export const UploadForm = ({ isOpen, onClose, folderId, currentFolderId, folderPath }: UploadFormProps) => {
-  const { accessToken } = useAuthContext();
+  const { accessToken, logout } = useAuthContext();
   const { fetchFolders } = useDriveContext();
-  const { upload, uploadProgress } = useUpload(accessToken);
+  const { upload, uploadProgress } = useUpload(accessToken, logout);
 
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');

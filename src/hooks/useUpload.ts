@@ -2,7 +2,14 @@ import { useState, useCallback } from 'react';
 import { uploadFile } from '../services/googleDrive';
 import type { UploadProgress, UploadFileParams } from '../types';
 
-export const useUpload = (accessToken: string | null) => {
+const isAuthError = (error: any): boolean => {
+  return error?.response?.status === 401 ||
+         error?.message?.includes('401') ||
+         error?.message?.includes('unauthorized') ||
+         error?.message?.includes('invalid_token');
+};
+
+export const useUpload = (accessToken: string | null, onAuthError?: () => void) => {
   const [uploadProgress, setUploadProgress] = useState<UploadProgress>({
     fileName: '',
     progress: 0,
@@ -43,6 +50,11 @@ export const useUpload = (accessToken: string | null) => {
 
         return true;
       } catch (err) {
+        console.error('Upload error:', err);
+        if (isAuthError(err)) {
+          console.log('Auth error detected during upload, logging out...');
+          onAuthError?.();
+        }
         setUploadProgress({
           fileName: params.fileName,
           progress: 0,
@@ -52,7 +64,7 @@ export const useUpload = (accessToken: string | null) => {
         return false;
       }
     },
-    [accessToken]
+    [accessToken, onAuthError]
   );
 
   const resetProgress = useCallback(() => {
