@@ -75,31 +75,29 @@ export const Dashboard = () => {
         <div className="mb-8 flex flex-col gap-4">
           {/* Back Button and Action Buttons Row */}
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            {folderPath.length > 0 && (
-              <button
-                onClick={handleBack}
-                className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                <span>Back</span>
-              </button>
-            )}
-            {!folderPath.length && <div></div>}
+            <button
+              onClick={handleBack}
+              disabled={folderPath.length === 0}
+              className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Back</span>
+            </button>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowCreateFolder(true)}
-                className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
+                className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
               >
-                <span className="text-lg">📁</span>
+                <span className="text-lg mr-2">📁</span>
                 <span>New Folder</span>
               </button>
               <button
                 onClick={() => setShowUpload(true)}
-                className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
+                className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
               >
-                <span className="text-lg">📤</span>
+                <span className="text-lg mr-2">📤</span>
                 <span>Upload</span>
               </button>
             </div>
@@ -126,10 +124,10 @@ export const Dashboard = () => {
           {/* Camera Button - Full Width */}
           <button
             onClick={() => setShowCamera(true)}
-            className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-lg"
+            className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
           >
-            <span className="text-2xl">📸</span>
-            <span>Take Photo</span>
+            <span className="text-4xl">📸</span>
+            <span className="text-lg font-bold">Take Photo</span>
           </button>
         </div>
 
