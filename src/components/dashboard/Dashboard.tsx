@@ -55,35 +55,35 @@ export const Dashboard = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb Navigation */}
-        {folderPath.length > 0 && (
-          <div className="mb-6 flex items-center space-x-2 text-sm">
+        <div className="mb-6 flex items-center space-x-3 text-sm bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200">
+          {folderPath.length > 0 && (
             <button
               onClick={handleBack}
-              className="flex items-center space-x-2 px-4 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-all border border-gray-200 hover:border-blue-300"
+              className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 transition-colors"
+              title="Go back"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span className="font-medium">Back</span>
             </button>
-            <div className="flex items-center space-x-2 text-gray-600">
-              <button onClick={() => handleBreadcrumbClick(-1)} className="hover:text-blue-600 font-medium">
-                Home
-              </button>
-              {folderPath.map((folder, index) => (
-                <div key={folder.id} className="flex items-center space-x-2">
-                  <span>/</span>
-                  <button
-                    onClick={() => handleBreadcrumbClick(index)}
-                    className="hover:text-blue-600 font-medium"
-                  >
-                    {folder.name}
-                  </button>
-                </div>
-              ))}
-            </div>
+          )}
+          <div className="flex items-center space-x-2 text-gray-600">
+            <button onClick={() => handleBreadcrumbClick(-1)} className="hover:text-blue-600 font-medium transition-colors">
+              Home
+            </button>
+            {folderPath.map((folder, index) => (
+              <div key={folder.id} className="flex items-center space-x-2">
+                <span className="text-gray-400">/</span>
+                <button
+                  onClick={() => handleBreadcrumbClick(index)}
+                  className="hover:text-blue-600 font-medium transition-colors"
+                >
+                  {folder.name}
+                </button>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
 
         {/* Top Actions Bar */}
         <div className="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
