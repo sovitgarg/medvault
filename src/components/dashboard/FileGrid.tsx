@@ -1,4 +1,4 @@
-import { GoogleDriveFile } from '../../types';
+import type { GoogleDriveFile } from '../../types';
 import { FileCard } from './FileCard';
 
 interface FileGridProps {

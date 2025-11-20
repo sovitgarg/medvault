@@ -7,6 +7,7 @@ export interface GoogleDriveFile {
   size?: string;
   webViewLink?: string;
   iconLink?: string;
+  thumbnailLink?: string;
   parents?: string[];
 }
 

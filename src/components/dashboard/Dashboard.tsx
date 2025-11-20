@@ -8,7 +8,7 @@ import { Loading } from '../common/Loading';
 import { CreateFolderModal } from '../folder/CreateFolderModal';
 import { UploadForm } from '../upload/UploadForm';
 import { CameraCapture } from '../upload/CameraCapture';
-import type { Folder, GoogleDriveFile } from '../../types';
+import type { Folder } from '../../types';
 
 export const Dashboard = () => {
   const { folders, files, loading, fetchFolders } = useDriveContext();
