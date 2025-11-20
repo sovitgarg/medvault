@@ -20,17 +20,20 @@ export const CameraCapture = ({ isOpen, onClose, folderId }: CameraCaptureProps)
   const { upload, uploadProgress } = useUpload(accessToken);
 
   const [fileName, setFileName] = useState('');
-  const [selectedFolder, setSelectedFolder] = useState(folderId || '');
+  const [selectedFolder, setSelectedFolder] = useState('');
 
   useEffect(() => {
     if (isOpen) {
       startCamera();
       setFileName(generateFileName('photo'));
+      if (folderId) {
+        setSelectedFolder(folderId);
+      }
     } else {
       stopCamera();
       clearCapturedImage();
     }
-  }, [isOpen]);
+  }, [isOpen, folderId]);
 
   const handleCapture = async () => {
     await capturePhoto();

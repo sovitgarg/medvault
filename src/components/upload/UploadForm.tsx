@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { useUpload } from '../../hooks/useUpload';
@@ -18,9 +18,16 @@ export const UploadForm = ({ isOpen, onClose, folderId }: UploadFormProps) => {
 
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
-  const [selectedFolder, setSelectedFolder] = useState(folderId || '');
+  const [selectedFolder, setSelectedFolder] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Set the selected folder when modal opens
+  useEffect(() => {
+    if (isOpen && folderId) {
+      setSelectedFolder(folderId);
+    }
+  }, [isOpen, folderId]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
