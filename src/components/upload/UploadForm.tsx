@@ -8,16 +8,17 @@ import { useDriveContext } from '../../context/DriveContext';
 interface UploadFormProps {
   isOpen: boolean;
   onClose: () => void;
+  folderId?: string;
 }
 
-export const UploadForm = ({ isOpen, onClose }: UploadFormProps) => {
+export const UploadForm = ({ isOpen, onClose, folderId }: UploadFormProps) => {
   const { accessToken } = useAuthContext();
   const { folders, fetchFolders } = useDriveContext();
   const { upload, uploadProgress } = useUpload(accessToken);
 
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
-  const [selectedFolder, setSelectedFolder] = useState('');
+  const [selectedFolder, setSelectedFolder] = useState(folderId || '');
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 

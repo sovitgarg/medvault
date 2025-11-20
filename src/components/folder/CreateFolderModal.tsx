@@ -7,9 +7,10 @@ import { validateFolderName } from '../../utils/validators';
 interface CreateFolderModalProps {
   isOpen: boolean;
   onClose: () => void;
+  parentFolderId?: string;
 }
 
-export const CreateFolderModal = ({ isOpen, onClose }: CreateFolderModalProps) => {
+export const CreateFolderModal = ({ isOpen, onClose, parentFolderId }: CreateFolderModalProps) => {
   const { createFolder } = useDriveContext();
   const [folderName, setFolderName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +26,7 @@ export const CreateFolderModal = ({ isOpen, onClose }: CreateFolderModalProps) =
     try {
       setIsCreating(true);
       setError(null);
-      await createFolder(folderName);
+      await createFolder(folderName, parentFolderId);
       setFolderName('');
       onClose();
     } catch (err) {

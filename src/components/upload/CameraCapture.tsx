@@ -10,16 +10,17 @@ import { generateFileName } from '../../utils/fileHelpers';
 interface CameraCaptureProps {
   isOpen: boolean;
   onClose: () => void;
+  folderId?: string;
 }
 
-export const CameraCapture = ({ isOpen, onClose }: CameraCaptureProps) => {
+export const CameraCapture = ({ isOpen, onClose, folderId }: CameraCaptureProps) => {
   const { accessToken } = useAuthContext();
   const { folders, fetchFolders } = useDriveContext();
   const { videoRef, capturedImage, isActive, startCamera, stopCamera, capturePhoto, clearCapturedImage } = useCamera();
   const { upload, uploadProgress } = useUpload(accessToken);
 
   const [fileName, setFileName] = useState('');
-  const [selectedFolder, setSelectedFolder] = useState('');
+  const [selectedFolder, setSelectedFolder] = useState(folderId || '');
 
   useEffect(() => {
     if (isOpen) {
