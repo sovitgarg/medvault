@@ -95,7 +95,8 @@ export const Dashboard = () => {
               </button>
               <button
                 onClick={() => setShowUpload(true)}
-                className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
+                disabled={!currentFolder}
+                className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 <span className="text-lg mr-2">📤</span>
                 <span>Upload</span>
@@ -124,7 +125,8 @@ export const Dashboard = () => {
           {/* Camera Button - Full Width */}
           <button
             onClick={() => setShowCamera(true)}
-            className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            disabled={!currentFolder}
+            className="w-full flex items-center justify-center space-x-3 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             <span className="text-4xl">📸</span>
             <span className="text-lg font-bold">Take Photo</span>
