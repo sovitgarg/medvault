@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { GoogleDriveFile } from '../../types';
 import { formatFileSize, formatDate } from '../../utils/formatters';
-import { useAuthContext } from '../../context/AuthContext';
 
 interface FileCardProps {
   file: GoogleDriveFile;
@@ -9,46 +8,39 @@ interface FileCardProps {
 }
 
 export const FileCard = ({ file, onClick }: FileCardProps) => {
-  const { accessToken } = useAuthContext();
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
-  const isImage = file.mimeType?.startsWith('image/');
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
+
+  // Check if file is an image by mimeType or extension (for HEIC, etc.)
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.heif', '.bmp'];
+  const isImageByExtension = imageExtensions.some(ext =>
+    file.name?.toLowerCase().endsWith(ext)
+  );
+  const isImage = file.mimeType?.startsWith('image/') || isImageByExtension;
   const isPdf = file.mimeType === 'application/pdf';
 
-  // Fetch authenticated thumbnail using Google Drive API
   useEffect(() => {
-    if (isImage && accessToken && !imageError && file.id) {
-      const fetchThumbnail = async () => {
-        try {
-          // Use Google Drive API to get file content with alt=media
-          const url = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
-          const response = await fetch(url, {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-          if (response.ok) {
-            const blob = await response.blob();
-            const objectUrl = URL.createObjectURL(blob);
-            setThumbnailUrl(objectUrl);
-          } else {
-            console.error('Failed to fetch image:', response.status);
-            setImageError(true);
-          }
-        } catch (error) {
-          console.error('Failed to fetch thumbnail:', error);
-          setImageError(true);
-        }
-      };
-      fetchThumbnail();
-    }
+    // Reset state when file changes
+    setHasError(false);
 
-    return () => {
-      if (thumbnailUrl) {
-        URL.revokeObjectURL(thumbnailUrl);
-      }
-    };
-  }, [isImage, file.id, accessToken, imageError]);
+    if (file.thumbnailLink) {
+      setImgSrc(file.thumbnailLink);
+    } else if (file.iconLink) {
+      setImgSrc(file.iconLink.replace('16', '128'));
+    } else {
+      setImgSrc(null);
+    }
+  }, [file]);
+
+  const handleError = () => {
+    if (imgSrc === file.thumbnailLink && file.iconLink) {
+      // If thumbnail failed, try icon
+      setImgSrc(file.iconLink.replace('16', '128'));
+    } else {
+      // If icon also failed (or we were already using it), show placeholder
+      setHasError(true);
+    }
+  };
 
   const handleClick = () => {
     onClick(file);
@@ -61,14 +53,15 @@ export const FileCard = ({ file, onClick }: FileCardProps) => {
     >
       {/* Thumbnail */}
       <div className="aspect-square mb-3 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-        {isImage && thumbnailUrl && !imageError ? (
+        {imgSrc && !hasError ? (
           <img
-            src={thumbnailUrl}
+            src={imgSrc}
             alt={file.name}
             className="w-full h-full object-cover"
-            onError={() => setImageError(true)}
+            onError={handleError}
+            referrerPolicy="no-referrer"
           />
-        ) : isImage && !thumbnailUrl && !imageError ? (
+        ) : isImage ? (
           <div className="w-full h-full flex items-center justify-center bg-blue-50">
             <span className="text-5xl">🖼️</span>
           </div>

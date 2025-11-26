@@ -123,7 +123,7 @@ export const listFiles = async (
       },
       params: {
         q: query,
-        fields: 'files(id, name, mimeType, createdTime, modifiedTime, size, webViewLink, thumbnailLink)',
+        fields: 'files(id, name, mimeType, createdTime, modifiedTime, size, webViewLink, thumbnailLink, iconLink)',
         pageSize,
         orderBy: 'modifiedTime desc',
       },
@@ -199,7 +199,7 @@ export const getFilesInFolder = async (
       },
       params: {
         q: `'${folderId}' in parents and trashed=false`,
-        fields: 'files(id, name, mimeType, createdTime, modifiedTime, size, webViewLink, iconLink)',
+        fields: 'files(id, name, mimeType, createdTime, modifiedTime, size, webViewLink, iconLink, thumbnailLink)',
         pageSize: 100,
         orderBy: 'modifiedTime desc',
       },
