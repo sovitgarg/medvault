@@ -2,12 +2,11 @@
 export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 export const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || '';
 
-// Google Drive API Scopes (Privacy-First - Minimal Access)
+// Google Drive API Scopes (Full Access)
 export const GOOGLE_SCOPES = [
   'https://www.googleapis.com/auth/userinfo.email',
   'https://www.googleapis.com/auth/userinfo.profile',
-  'https://www.googleapis.com/auth/drive.file',
-  'https://www.googleapis.com/auth/drive.metadata.readonly',
+  'https://www.googleapis.com/auth/drive',
 ].join(' ');
 
 // Google Drive API Endpoints
