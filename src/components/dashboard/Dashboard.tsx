@@ -8,16 +8,20 @@ import { Loading } from '../common/Loading';
 import { CreateFolderModal } from '../folder/CreateFolderModal';
 import { UploadForm } from '../upload/UploadForm';
 import { CameraCapture } from '../upload/CameraCapture';
-import type { Folder } from '../../types';
+import { MoveFileModal } from './MoveFileModal';
+import type { Folder, GoogleDriveFile } from '../../types';
 
 export const Dashboard = () => {
-  const { folders, files, loading, fetchFolders } = useDriveContext();
+  const { folders, files, loading, fetchFolders, deleteFile, moveFile } = useDriveContext();
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [currentFolder, setCurrentFolder] = useState<Folder | null>(null);
   const [folderPath, setFolderPath] = useState<Folder[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [showMoveModal, setShowMoveModal] = useState(false);
 
   useEffect(() => {
     fetchFolders(currentFolder?.id);
@@ -66,6 +70,58 @@ export const Dashboard = () => {
     }
   };
 
+  const toggleSelection = (itemId: string) => {
+    const newSelected = new Set(selectedItems);
+    if (newSelected.has(itemId)) {
+      newSelected.delete(itemId);
+    } else {
+      newSelected.add(itemId);
+    }
+    setSelectedItems(newSelected);
+  };
+
+  const handleMoveComplete = () => {
+    setSelectedItems(new Set());
+    setIsSelectionMode(false);
+    fetchFolders(currentFolder?.id);
+  };
+
+  const handleFolderClickWrapper = (folder: Folder) => {
+    if (isSelectionMode) {
+      toggleSelection(folder.id);
+    } else {
+      handleFolderClick(folder);
+    }
+  };
+
+  const handleFileClickWrapper = (file: GoogleDriveFile) => {
+    if (isSelectionMode) {
+      toggleSelection(file.id);
+    } else if (file.webViewLink) {
+      window.open(file.webViewLink, '_blank');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (selectedItems.size === 0) return;
+
+    const confirmMessage = `Are you sure you want to delete ${selectedItems.size} item${selectedItems.size > 1 ? 's' : ''}? This action cannot be undone.`;
+    if (!confirm(confirmMessage)) return;
+
+    let successCount = 0;
+    for (const itemId of selectedItems) {
+      const success = await deleteFile(itemId);
+      if (success) successCount++;
+    }
+
+    setSelectedItems(new Set());
+    setIsSelectionMode(false);
+
+    if (successCount > 0) {
+      fetchFolders(currentFolder?.id);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <Header />
@@ -86,21 +142,58 @@ export const Dashboard = () => {
               <span>Back</span>
             </button>
             <div className="flex gap-2">
-              <button
-                onClick={() => setShowCreateFolder(true)}
-                className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
-              >
-                <span className="text-lg mr-2">📁</span>
-                <span>New Folder</span>
-              </button>
-              <button
-                onClick={() => setShowUpload(true)}
-                disabled={!currentFolder}
-                className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-              >
-                <span className="text-lg mr-2">📤</span>
-                <span>Upload</span>
-              </button>
+              {isSelectionMode ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setIsSelectionMode(false);
+                      setSelectedItems(new Set());
+                    }}
+                    className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
+                  >
+                    <span>Cancel</span>
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={selectedItems.size === 0}
+                    className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    <span>Delete ({selectedItems.size})</span>
+                  </button>
+                  <button
+                    onClick={() => setShowMoveModal(true)}
+                    disabled={selectedItems.size === 0 || !currentFolder}
+                    className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    <span>Move ({selectedItems.size})</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setIsSelectionMode(true)}
+                    className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
+                  >
+                    <span className="text-lg mr-2">✓</span>
+                    <span>Select</span>
+                  </button>
+                  <button
+                    onClick={() => setShowCreateFolder(true)}
+                    className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm"
+                  >
+                    <span className="text-lg mr-2">📁</span>
+                    <span>New Folder</span>
+                  </button>
+                  <button
+                    onClick={() => setShowUpload(true)}
+                    disabled={!currentFolder}
+                    className="flex items-center justify-center h-11 px-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    <span className="text-lg mr-2">📤</span>
+                    <span>Upload</span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -147,7 +240,13 @@ export const Dashboard = () => {
         {filteredFolders.length > 0 && (
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Folders</h3>
-            <FolderGrid folders={filteredFolders} loading={loading} onFolderClick={handleFolderClick} />
+            <FolderGrid
+              folders={filteredFolders}
+              loading={loading}
+              onFolderClick={handleFolderClickWrapper}
+              selectionMode={isSelectionMode}
+              selectedItems={selectedItems}
+            />
           </div>
         )}
 
@@ -158,11 +257,9 @@ export const Dashboard = () => {
             <FileGrid
               files={filteredFiles}
               loading={loading}
-              onFileClick={(file) => {
-                if (file.webViewLink) {
-                  window.open(file.webViewLink, '_blank');
-                }
-              }}
+              onFileClick={handleFileClickWrapper}
+              selectionMode={isSelectionMode}
+              selectedItems={selectedItems}
             />
           </div>
         )}
@@ -208,6 +305,17 @@ export const Dashboard = () => {
           folderId={currentFolder?.id}
           currentFolderId={currentFolder?.id}
           folderPath={folderPath}
+        />
+      )}
+
+      {showMoveModal && (
+        <MoveFileModal
+          isOpen={showMoveModal}
+          onClose={() => setShowMoveModal(false)}
+          selectedItems={selectedItems}
+          currentFolderId={currentFolder?.id}
+          onMoveComplete={handleMoveComplete}
+          moveFile={moveFile}
         />
       )}
     </div>

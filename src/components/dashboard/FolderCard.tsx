@@ -4,9 +4,11 @@ import type { Folder } from '../../types';
 interface FolderCardProps {
   folder: Folder;
   onClick: (folder: Folder) => void;
+  selectionMode?: boolean;
+  isSelected?: boolean;
 }
 
-export const FolderCard = ({ folder, onClick }: FolderCardProps) => {
+export const FolderCard = ({ folder, onClick, selectionMode = false, isSelected = false }: FolderCardProps) => {
   const handleClick = () => {
     onClick(folder);
   };
@@ -21,8 +23,24 @@ export const FolderCard = ({ folder, onClick }: FolderCardProps) => {
   return (
     <div
       onClick={handleClick}
-      className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-6 cursor-pointer border border-gray-100 hover:border-blue-200 hover:scale-105"
+      className={`relative group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-6 cursor-pointer border hover:scale-105 ${isSelected ? 'border-blue-500 border-2' : 'border-gray-100 hover:border-blue-200'
+        }`}
     >
+      {/* Selection Checkbox Overlay */}
+      {selectionMode && (
+        <div className="absolute top-3 right-3 z-10">
+          <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${isSelected
+            ? 'bg-blue-600 border-blue-600'
+            : 'bg-white border-gray-400'
+            }`}>
+            {isSelected && (
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+        </div>
+      )}
       <div className="flex items-center space-x-4">
         <div className="flex-shrink-0 bg-gradient-to-br from-blue-500 to-indigo-600 p-4 rounded-xl shadow-lg">
           <svg

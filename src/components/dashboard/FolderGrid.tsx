@@ -5,9 +5,11 @@ interface FolderGridProps {
   folders: Folder[];
   loading: boolean;
   onFolderClick: (folder: Folder) => void;
+  selectionMode?: boolean;
+  selectedItems?: Set<string>;
 }
 
-export const FolderGrid = ({ folders, loading, onFolderClick }: FolderGridProps) => {
+export const FolderGrid = ({ folders, loading, onFolderClick, selectionMode = false, selectedItems = new Set() }: FolderGridProps) => {
   if (loading) {
     return (
       <div className="text-center py-12">
@@ -42,7 +44,13 @@ export const FolderGrid = ({ folders, loading, onFolderClick }: FolderGridProps)
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {folders.map((folder) => (
-        <FolderCard key={folder.id} folder={folder} onClick={onFolderClick} />
+        <FolderCard
+          key={folder.id}
+          folder={folder}
+          onClick={onFolderClick}
+          selectionMode={selectionMode}
+          isSelected={selectedItems.has(folder.id)}
+        />
       ))}
     </div>
   );

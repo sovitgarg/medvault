@@ -4,14 +4,16 @@ import {
   listFiles,
   searchFolders as searchDriveFolders,
   createFolder as createDriveFolder,
+  moveFile as moveDriveFile,
+  deleteFile as deleteDriveFile,
 } from '../services/googleDrive';
 import type { Folder, GoogleDriveFile } from '../types';
 
 const isAuthError = (error: any): boolean => {
   return error?.response?.status === 401 ||
-         error?.message?.includes('401') ||
-         error?.message?.includes('unauthorized') ||
-         error?.message?.includes('invalid_token');
+    error?.message?.includes('401') ||
+    error?.message?.includes('unauthorized') ||
+    error?.message?.includes('invalid_token');
 };
 
 export const useDrive = (accessToken: string | null, onAuthError?: () => void) => {
@@ -96,6 +98,64 @@ export const useDrive = (accessToken: string | null, onAuthError?: () => void) =
     [accessToken, onAuthError]
   );
 
+  const moveFile = useCallback(
+    async (fileId: string, currentParentId: string, newParentId: string): Promise<GoogleDriveFile | null> => {
+      if (!accessToken) return null;
+
+      try {
+        setLoading(true);
+        setError(null);
+        const movedFile = await moveDriveFile(accessToken, fileId, currentParentId, newParentId);
+
+        // Update local state
+        setFiles((prev) => prev.filter((f) => f.id !== fileId));
+        setFolders((prev) => prev.filter((f) => f.id !== fileId));
+
+        return movedFile;
+      } catch (err) {
+        console.error('Error moving file:', err);
+        if (isAuthError(err)) {
+          console.log('Auth error detected, logging out...');
+          onAuthError?.();
+        }
+        setError(err instanceof Error ? err.message : 'Failed to move file');
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [accessToken, onAuthError]
+  );
+
+  const deleteFile = useCallback(
+    async (fileId: string): Promise<boolean> => {
+      if (!accessToken) return false;
+
+      try {
+        setLoading(true);
+        setError(null);
+        await deleteDriveFile(accessToken, fileId);
+
+        // Update local state
+        setFiles((prev) => prev.filter((f) => f.id !== fileId));
+        setFolders((prev) => prev.filter((f) => f.id !== fileId));
+
+        return true;
+      } catch (err) {
+        console.error('Error deleting file:', err);
+        if (isAuthError(err)) {
+          console.log('Auth error detected, logging out...');
+          onAuthError?.();
+        }
+        setError(err instanceof Error ? err.message : 'Failed to delete file');
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [accessToken, onAuthError]
+  );
+
   return {
     folders,
     files,
@@ -104,5 +164,7 @@ export const useDrive = (accessToken: string | null, onAuthError?: () => void) =
     fetchFolders,
     searchFolders,
     createFolder,
+    moveFile,
+    deleteFile,
   };
 };

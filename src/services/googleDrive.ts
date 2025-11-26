@@ -235,3 +235,57 @@ export const getFolderById = async (
     throw new Error('Failed to get folder');
   }
 };
+
+/**
+ * Move a file or folder to a new parent folder
+ */
+export const moveFile = async (
+  accessToken: string,
+  fileId: string,
+  currentParentId: string,
+  newParentId: string
+): Promise<GoogleDriveFile> => {
+  try {
+    const response = await axios.patch<GoogleDriveFile>(
+      `${DRIVE_API_BASE}/files/${fileId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          addParents: newParentId,
+          removeParents: currentParentId,
+          fields: 'id, name, mimeType, createdTime, modifiedTime, size, webViewLink, iconLink, thumbnailLink, parents',
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error moving file:', error);
+    throw new Error('Failed to move file');
+  }
+};
+
+/**
+ * Delete a file or folder
+ */
+export const deleteFile = async (
+  accessToken: string,
+  fileId: string
+): Promise<void> => {
+  try {
+    await axios.delete(
+      `${DRIVE_API_BASE}/files/${fileId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    throw new Error('Failed to delete file');
+  }
+};

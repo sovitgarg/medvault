@@ -5,9 +5,11 @@ interface FileGridProps {
   files: GoogleDriveFile[];
   loading: boolean;
   onFileClick: (file: GoogleDriveFile) => void;
+  selectionMode?: boolean;
+  selectedItems?: Set<string>;
 }
 
-export const FileGrid = ({ files, loading, onFileClick }: FileGridProps) => {
+export const FileGrid = ({ files, loading, onFileClick, selectionMode = false, selectedItems = new Set() }: FileGridProps) => {
   if (loading) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -40,7 +42,13 @@ export const FileGrid = ({ files, loading, onFileClick }: FileGridProps) => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
       {files.map((file) => (
-        <FileCard key={file.id} file={file} onClick={onFileClick} />
+        <FileCard
+          key={file.id}
+          file={file}
+          onClick={onFileClick}
+          selectionMode={selectionMode}
+          isSelected={selectedItems.has(file.id)}
+        />
       ))}
     </div>
   );

@@ -5,9 +5,11 @@ import { formatFileSize, formatDate } from '../../utils/formatters';
 interface FileCardProps {
   file: GoogleDriveFile;
   onClick: (file: GoogleDriveFile) => void;
+  selectionMode?: boolean;
+  isSelected?: boolean;
 }
 
-export const FileCard = ({ file, onClick }: FileCardProps) => {
+export const FileCard = ({ file, onClick, selectionMode = false, isSelected = false }: FileCardProps) => {
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
 
@@ -49,8 +51,24 @@ export const FileCard = ({ file, onClick }: FileCardProps) => {
   return (
     <div
       onClick={handleClick}
-      className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-4 cursor-pointer border border-gray-100 hover:border-blue-200 hover:scale-105"
+      className={`relative group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 p-4 cursor-pointer border hover:scale-105 ${isSelected ? 'border-blue-500 border-2' : 'border-gray-100 hover:border-blue-200'
+        }`}
     >
+      {/* Selection Checkbox Overlay */}
+      {selectionMode && (
+        <div className="absolute top-2 right-2 z-10">
+          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isSelected
+            ? 'bg-blue-600 border-blue-600'
+            : 'bg-white border-gray-400'
+            }`}>
+            {isSelected && (
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+        </div>
+      )}
       {/* Thumbnail */}
       <div className="aspect-square mb-3 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
         {imgSrc && !hasError ? (

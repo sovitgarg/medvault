@@ -12,6 +12,8 @@ interface DriveContextType {
   fetchFolders: (parentFolderId?: string) => Promise<void>;
   searchFolders: (query: string) => Promise<void>;
   createFolder: (folderName: string, parentFolderId?: string) => Promise<Folder | null>;
+  moveFile: (fileId: string, currentParentId: string, newParentId: string) => Promise<GoogleDriveFile | null>;
+  deleteFile: (fileId: string) => Promise<boolean>;
 }
 
 const DriveContext = createContext<DriveContextType | undefined>(undefined);
